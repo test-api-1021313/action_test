@@ -12,5 +12,5 @@ jobs:
           token: ${{secrets.GITHUB_TOKEN}}
           labels: '["WFR","update image"]'
           skip_hour: '24'
-      - name: output
+      - name: output information
         run: echo '${{ steps.list.outputs.pulls }}'
