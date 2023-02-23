@@ -1,0 +1,28 @@
+# ./.github/workflows/microservice-vm-auto-pr.yaml
+name: VM Microservice Stage Auto PR
+on:
+  push:
+    branches: 
+      - feature/add_action
+
+jobs:
+  pull-request:
+    name: Open PR to app-prod
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      name: checkout
+
+    - uses: repo-sync/pull-request@v2
+      name: pull-request
+      with:
+        destination_branch: "main"
+        pr_title: "Vm Microservice PR to app-prod"
+        pr_body: "*An automated PR*"
+        pr_reviewer: "fangchao2023"
+        pr_draft: false
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: output-url
+      run: echo ${{steps.open-pr.outputs.pr_url}}
+    - name: output-number
+      run: echo ${{steps.open-pr.outputs.pr_number}}
