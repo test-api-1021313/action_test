@@ -1,31 +1,25 @@
-name: Find PRs with 'update' keyword
-
+name: "Find Pull Requests with Update Keyword"
 on:
   pull_request:
-    types: [opened, reopened, edited]
+    types: [opened, reopened, synchronize]
 
 jobs:
-  find-prs:
+  find-update-prs:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Find PRs with 'update' keyword
-        run: |
-          keyword="update"
-          for pr_number in $(jq --raw-output .pull_requests[].number $GITHUB_EVENT_PATH); do
-            pr_title=$(curl --silent -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number" \
-              | jq --raw-output '.title')
-            if echo "$pr_title" | grep -q "$keyword"; then
-              pr_link=$(curl --silent -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                -H "Accept: application/vnd.github.v3+json" \
-                "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number" \
-                | jq --raw-output '.html_url')
-              echo "PR #$pr_number: $pr_link"
-            fi
-          done
+    - name: Find PRs with Update Keyword
+      id: find-prs
+      uses: peter-evans/find-pull-request@v1
+      with:
+        search: 'update'
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Print PR Links
+      run: |
+        for pr in ${{ steps.find-prs.outputs.number }}; do
+          echo "https://github.com/${{ github.repository }}/pull/$pr"
+        done
 
